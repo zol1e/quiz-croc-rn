@@ -1,6 +1,7 @@
 import { useLocalSearchParams } from "expo-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ActivityIndicator, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { WS_BASE } from '../config';
 import AnswerInput from "./components/AnswerInput";
 import AnswerList from "./components/AnswerList";
 import Countdown from "./components/Countdown";
@@ -21,7 +22,7 @@ export default function Game() {
 
   const wsUrl = useMemo(() => {
     if (!gameId) return null;
-    return `ws://localhost:8787/game/${gameId}/ws`;
+    return `${WS_BASE}/game/${gameId}/ws`;
   }, [gameId]);
 
   useEffect(() => {
@@ -42,6 +43,7 @@ export default function Game() {
     socket.onmessage = (event) => {
       try {
         const parsed = JSON.parse(event.data);
+        console.log("Received game event", parsed);
         setGameEvent((prev) => {
           setPreviousGameEvent(prev ?? null);
           return parsed as GameEvent;
@@ -77,12 +79,15 @@ export default function Game() {
   }, [gameEvent, previousGameEvent]);
 
   const sendMessageSafe = (payload: GameMessage) => {
+    console.log("Sending message", payload);
     if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
       socketRef.current.send(JSON.stringify(payload));
+      console.log("Sent message", payload);
     }
   };
 
   function answerQuestion(answerText: string) {
+    console.log("Answering question", answerText);
     if (!playerId || !gameId) return;
     const message = new GameMessage(
       GameMessageType.ANSWER,

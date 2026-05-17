@@ -2,6 +2,7 @@ import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Alert, Platform, Pressable, StyleSheet, Text, View } from "react-native";
 import { Input } from 'react-native-elements';
+import { HTTP_BASE } from '../config';
 
 export default function Index() {
   const router = useRouter();
@@ -20,7 +21,7 @@ export default function Index() {
     setIsCreating(true);
 
     try {
-      const url = `http://localhost:8787/game/create?topic=${encodeURIComponent(topic.trim())}`;
+      const url = `${HTTP_BASE}/game/create?topic=${encodeURIComponent(topic.trim())}`;
       const response = await fetch(url, { method: 'POST' });
 
       if (!response.ok) {
